@@ -1,30 +1,63 @@
 const express = require('express')
 const path = require('path')
 const dotenv = require('dotenv').config()
-const port = process.env.PORT || 5000
+const passport = require('passport')
+const session = require('express-session');
 const mongoose = require('mongoose')
 const {errorHandler} = require('./middleware/errorHandler')
 const connectDB = require('./db')
+
+const MongoStore = require('connect-mongo');
+
 const app = express()
+
+const port = process.env.PORT || 5000
 
 connectDB()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.use('/api/players', require('./routes/playersRouter'))
-// Serve frontend
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')))
+const sessionStore = MongoStore.create({ mongoUrl: process.env.ATLAS_URI, collectionName: 'sessions' });
 
-  app.get('*', (req, res) =>
-    res.sendFile(
-      path.resolve(__dirname, '../', 'frontend', 'build', 'index.html')
-    )
-  )
-} else {
-  app.get('/', (req, res) => res.send('Please set to production'))
-}
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    store: sessionStore,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
+    }
+}));
+
+require('./passport')
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use((req, res, next) => {
+  console.log(req.session);
+  console.log(req.user);
+  console.log(req.isAuthenticated())
+  next();
+});
+
+app.use('/api/players', require('./routes/playersRouter'))
+app.use('/api/users', require('./routes/usersRouter'))
+
+// Serve frontend
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, '../frontend/build')))
+
+//   app.get('*', (req, res) =>
+//     res.sendFile(
+//       path.resolve(__dirname, '../', 'frontend', 'build', 'index.html')
+//     )
+//   )
+//   // app.use(express.static(path.join(__dirname, '../frontend/public')))
+// } else {
+//   app.get('/', (req, res) => res.send('Please set to production'))
+// }
 
 // const uri = process.env.ATLAS_URI;
 // const connectDB = async () => {

@@ -1,6 +1,14 @@
 const asyncHandler = require('express-async-handler')
 const playersRouter = require('express').Router()
-const Player = require('../playersModel')
+const Player = require('../models/playersModel')
+
+playersRouter.use((req,res,next) => {
+    if (req.isAuthenticated()) {
+        next();
+    } else {
+        res.status(401).json({ msg: 'You are not authorized to view this resource' });
+    }
+})
 
 playersRouter.get('/', asyncHandler(async (req,res,next) => {
     const players = await Player.find()
