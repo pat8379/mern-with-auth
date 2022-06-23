@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: false }))
 const sessionStore = MongoStore.create({ mongoUrl: process.env.ATLAS_URI, collectionName: 'sessions' });
 
 app.use(session({
-    secret: 'secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     store: sessionStore,
