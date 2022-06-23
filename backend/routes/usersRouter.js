@@ -1,19 +1,23 @@
 const asyncHandler = require('express-async-handler')
 const passport = require('passport')
 const usersRouter = require('express').Router()
+const bcrypt = require('bcryptjs')
 const User = require('../models/usersModel')
 
 usersRouter.post('/login', passport.authenticate("local", {failureMessage: true}), (req,res) => {
-    console.log(req.body)
+    // console.log(req.body)
     res.send("sent")
 })
 
 usersRouter.post('/register', asyncHandler(async (req,res,next) => {
     const {username, password} = req.body
     if (username && password){
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
+
         const newUser = {
             username: username,
-            password: password
+            password: hashedPassword
         }
         const user = await User.create(newUser)
         res.send(user)
@@ -22,10 +26,10 @@ usersRouter.post('/register', asyncHandler(async (req,res,next) => {
     }
 }))
 
-usersRouter.get('/all', asyncHandler(async(req,res,next) => {
-    const all = await User.find()
-    res.send(all)
-}))
+// usersRouter.get('/all', asyncHandler(async(req,res,next) => {
+//     const all = await User.find()
+//     res.send(all)
+// }))
 
 usersRouter.get('/count', (req, res, next) => {
     if (req.session.viewCount) {

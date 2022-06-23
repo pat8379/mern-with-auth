@@ -5,31 +5,45 @@ function Login() {
   let navigate = useNavigate();
   const [name,setName] = useState()
   const [password, setPassword] = useState()
+  const [errMsg, setErrMsg] = useState()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    try {
-      const body = {
-        username: name,
-        password: password.toString()
+    if (name && password) {
+      setErrMsg("Loading")
+      try {
+        const body = {
+          username: name,
+          password: password.toString()
+        }
+
+        const results = await fetch('/api/users/login', {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        })
+
+        if (results.status !== 200) {
+          setErrMsg('User not found or incorrect password')
+          return
+        }
+        // console.log(results)
+        navigate('/')
+      } catch (error) {
+        console.log(error)
       }
-      const response = await fetch('/api/users/login', {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      })
-      navigate('/')
-    } catch (error) {
-      console.log(error)
+    } else {
+      setErrMsg('Fill in both fields')
     }
-  }
+  } 
 
   return (
     <div>
       <input placeholder='name' value={name} required onChange={(e) => setName(e.target.value)}/>
       <input placeholder='password' value={password} required onChange={(e) => setPassword(e.target.value)}/>
       <button onClick={handleSubmit}>Login</button>
+      {errMsg && <p>{errMsg}</p>}
     </div>
   )
 }

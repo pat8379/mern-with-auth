@@ -28,6 +28,8 @@ function App() {
       <Post/>  
       <Delete/>  
       <br/>
+      <button onClick={() => navigate('/register')}>Register</button>
+      <button onClick={() => navigate('/login')}>Log in</button>
       <button onClick={handleLogOut}>Log Out</button>
     </div>
   );

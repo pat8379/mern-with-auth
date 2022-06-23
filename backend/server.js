@@ -35,29 +35,29 @@ require('./passport')
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use((req, res, next) => {
-  console.log(req.session);
-  console.log(req.user);
-  console.log(req.isAuthenticated())
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(req.session);
+//   console.log(req.user);
+//   console.log(req.isAuthenticated())
+//   next();
+// });
 
 app.use('/api/players', require('./routes/playersRouter'))
 app.use('/api/users', require('./routes/usersRouter'))
 
 // Serve frontend
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(express.static(path.join(__dirname, '../frontend/build')))
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')))
 
-//   app.get('*', (req, res) =>
-//     res.sendFile(
-//       path.resolve(__dirname, '../', 'frontend', 'build', 'index.html')
-//     )
-//   )
-//   // app.use(express.static(path.join(__dirname, '../frontend/public')))
-// } else {
-//   app.get('/', (req, res) => res.send('Please set to production'))
-// }
+  app.get('*', (req, res) =>
+    res.sendFile(
+      path.resolve(__dirname, '../', 'frontend', 'build', 'index.html')
+    )
+  )
+  // app.use(express.static(path.join(__dirname, '../frontend/public')))
+} else {
+  app.get('/', (req, res) => res.send('Please set to production'))
+}
 
 // const uri = process.env.ATLAS_URI;
 // const connectDB = async () => {
