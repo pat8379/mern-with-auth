@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const playersRouter = require('express').Router()
 const Player = require('../models/playersModel')
+const userPlayer = require('../models/userSpecificPlayerModel')
 
 playersRouter.use((req,res,next) => {
     if (req.isAuthenticated()) {
@@ -13,6 +14,14 @@ playersRouter.use((req,res,next) => {
 playersRouter.get('/', asyncHandler(async (req,res,next) => {
     const players = await Player.find()
     res.json(players)
+}))
+
+playersRouter.get('/account/specificPlayer', asyncHandler(async (req,res,next) => {
+    const userSpecific = await userPlayer.find({
+        user: req.user.id
+    })
+    res.send(userSpecific)
+    // res.json("Bithc")
 }))
 
 playersRouter.get('/:playerName', asyncHandler(async (req,res,next) => {
@@ -31,8 +40,15 @@ playersRouter.post('/', asyncHandler(async (req,res,next) => {
     res.send(player)
 }))
 
-playersRouter.put('/:id',  asyncHandler(async(req,res,next) =>{
-    res.send(`put: ${req.params.id}`)
+playersRouter.post('/specificPlayer', asyncHandler( async(req,res,next) => {
+    const userSpecific = await userPlayer.create({
+        user: req.user.id,
+        playersName: req.body.playersName,
+        rating: req.body.rating,
+        position: req.body.position,
+        team: req.body.team
+    })
+    res.send(userSpecific)
 }))
 
 playersRouter.delete('/:playerName', asyncHandler(async(req,res,next) =>{

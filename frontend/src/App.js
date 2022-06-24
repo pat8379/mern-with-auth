@@ -3,6 +3,7 @@ import Delete from "./components/Delete";
 import { useNavigate } from 'react-router-dom'
 import GetAll from "./components/GetAll";
 import Post from "./components/Post";
+import SpecificPlayer from './components/SpecificPlayer';
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
       <GetAll/>
       <Post/>  
       <Delete/>  
+      <SpecificPlayer/>
       <br/>
       <button onClick={() => navigate('/register')}>Register</button>
       <button onClick={() => navigate('/login')}>Log in</button>

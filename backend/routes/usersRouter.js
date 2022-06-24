@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs')
 const User = require('../models/usersModel')
 
 usersRouter.post('/login', passport.authenticate("local", {failureMessage: true}), (req,res) => {
-    // console.log(req.body)
+    console.log(req.user.id)
     res.send("sent")
 })
 
